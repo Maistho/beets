@@ -177,6 +177,7 @@ sonosupdate = ["soco"]
 titlecase = ["titlecase"]
 thumbnails = ["Pillow", "pyxdg"]
 web = ["flask", "flask-cors"]
+webimport = ["flask", "flask-cors"]
 
 [tool.poetry.scripts]
 beet = "beets.ui:main"
