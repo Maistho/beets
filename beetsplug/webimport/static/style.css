@@ -1,0 +1,395 @@
+/* Beets Web Import - Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: #1a1a2e;
+    color: #e0e0e0;
+    min-height: 100vh;
+}
+
+header {
+    background: #16213e;
+    padding: 1rem 2rem;
+    border-bottom: 2px solid #0f3460;
+}
+
+header h1 {
+    font-size: 1.5rem;
+    color: #e94560;
+}
+
+main {
+    max-width: 900px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+}
+
+.panel {
+    background: #16213e;
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    border: 1px solid #0f3460;
+}
+
+.panel h2 {
+    color: #e94560;
+    margin-bottom: 0.75rem;
+    font-size: 1.25rem;
+}
+
+.panel p {
+    color: #a0a0b0;
+    margin-bottom: 1rem;
+}
+
+.hidden {
+    display: none !important;
+}
+
+/* Input Group */
+.input-group {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.input-group input {
+    flex: 1;
+    padding: 0.75rem 1rem;
+    border: 1px solid #0f3460;
+    border-radius: 6px;
+    background: #1a1a2e;
+    color: #e0e0e0;
+    font-size: 1rem;
+}
+
+.input-group input:focus {
+    outline: none;
+    border-color: #e94560;
+}
+
+/* Drop Zone */
+.drop-zone {
+    border: 2px dashed #0f3460;
+    border-radius: 8px;
+    padding: 2.5rem 1.5rem;
+    text-align: center;
+    transition: border-color 0.2s, background 0.2s;
+    cursor: pointer;
+    margin-bottom: 1rem;
+    position: relative;
+}
+
+.drop-zone:hover {
+    border-color: #e94560;
+    background: rgba(233, 69, 96, 0.05);
+}
+
+.drop-zone.drag-over {
+    border-color: #e94560;
+    background: rgba(233, 69, 96, 0.1);
+    border-style: solid;
+}
+
+.drop-zone-icon {
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.drop-zone-text {
+    color: #e0e0e0;
+    font-size: 1.1rem;
+    margin-bottom: 0.25rem;
+}
+
+.drop-zone-hint {
+    color: #666;
+    font-size: 0.85rem;
+}
+
+.upload-progress {
+    margin-top: 1rem;
+}
+
+.upload-progress-bar {
+    background: #1a1a2e;
+    border-radius: 4px;
+    height: 8px;
+    overflow: hidden;
+    margin-bottom: 0.5rem;
+}
+
+.upload-bar {
+    background: #e94560;
+    height: 100%;
+    width: 0%;
+    transition: width 0.3s;
+    border-radius: 4px;
+}
+
+#upload-status {
+    font-size: 0.85rem;
+    color: #a0a0b0;
+}
+
+/* Separator */
+.separator {
+    display: flex;
+    align-items: center;
+    margin: 1rem 0;
+    color: #666;
+    font-size: 0.85rem;
+}
+
+.separator::before,
+.separator::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: #0f3460;
+}
+
+.separator span {
+    padding: 0 0.75rem;
+}
+
+button, .btn {
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 6px;
+    background: #e94560;
+    color: white;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+button:hover, .btn:hover {
+    background: #d63851;
+}
+
+button:disabled {
+    background: #555;
+    cursor: not-allowed;
+}
+
+button.secondary {
+    background: #0f3460;
+}
+
+button.secondary:hover {
+    background: #1a4a8a;
+}
+
+/* Status Bar */
+.status-bar {
+    background: #1a1a2e;
+    padding: 0.75rem 1rem;
+    border-radius: 6px;
+    margin-bottom: 1rem;
+    border: 1px solid #0f3460;
+}
+
+.status-bar .status-running {
+    color: #ffd700;
+}
+
+.status-bar .status-completed {
+    color: #4caf50;
+}
+
+.status-bar .status-error {
+    color: #e94560;
+}
+
+/* Question Area */
+#question-area {
+    background: #1a1a2e;
+    border: 2px solid #e94560;
+    border-radius: 8px;
+    padding: 1.25rem;
+    margin-bottom: 1rem;
+}
+
+#question-area h3 {
+    color: #e94560;
+    margin-bottom: 0.5rem;
+}
+
+.task-info {
+    color: #a0a0b0;
+    margin-bottom: 1rem;
+    font-size: 0.9rem;
+}
+
+.task-info .path {
+    color: #ffd700;
+    font-family: monospace;
+    word-break: break-all;
+}
+
+/* Candidate List */
+.candidate-list {
+    list-style: none;
+    margin-bottom: 1rem;
+}
+
+.candidate-list li {
+    padding: 0.75rem;
+    margin-bottom: 0.5rem;
+    border-radius: 6px;
+    border: 1px solid #0f3460;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+}
+
+.candidate-list li:hover {
+    border-color: #e94560;
+    background: rgba(233, 69, 96, 0.1);
+}
+
+.candidate-list li.selected {
+    border-color: #e94560;
+    background: rgba(233, 69, 96, 0.2);
+}
+
+.candidate-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.candidate-name {
+    font-weight: bold;
+    color: #e0e0e0;
+}
+
+.candidate-similarity {
+    font-size: 0.85rem;
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+}
+
+.sim-high {
+    background: #1b5e20;
+    color: #a5d6a7;
+}
+
+.sim-medium {
+    background: #e65100;
+    color: #ffcc80;
+}
+
+.sim-low {
+    background: #b71c1c;
+    color: #ef9a9a;
+}
+
+.candidate-details {
+    color: #a0a0b0;
+    font-size: 0.85rem;
+    margin-top: 0.25rem;
+}
+
+.candidate-penalties {
+    color: #ff8a65;
+    font-size: 0.8rem;
+    margin-top: 0.25rem;
+}
+
+/* Action Buttons */
+.action-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 1rem;
+}
+
+.action-buttons button {
+    font-size: 0.9rem;
+    padding: 0.5rem 1rem;
+}
+
+/* Duplicate Resolution */
+.duplicate-info {
+    margin-bottom: 1rem;
+}
+
+.duplicate-item {
+    background: #16213e;
+    padding: 0.75rem;
+    border-radius: 6px;
+    margin-bottom: 0.5rem;
+    border-left: 3px solid #ffd700;
+}
+
+/* Search Form */
+.search-form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-top: 0.75rem;
+}
+
+.search-form input {
+    padding: 0.5rem 0.75rem;
+    border: 1px solid #0f3460;
+    border-radius: 6px;
+    background: #16213e;
+    color: #e0e0e0;
+    font-size: 0.9rem;
+}
+
+.search-form input:focus {
+    outline: none;
+    border-color: #e94560;
+}
+
+.search-form-buttons {
+    display: flex;
+    gap: 0.5rem;
+}
+
+/* Log Area */
+#log-area h3 {
+    color: #a0a0b0;
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
+}
+
+#log-messages {
+    max-height: 300px;
+    overflow-y: auto;
+    font-family: monospace;
+    font-size: 0.85rem;
+    padding: 0.75rem;
+    background: #0d0d1a;
+    border-radius: 6px;
+    border: 1px solid #0f3460;
+}
+
+.log-entry {
+    padding: 0.25rem 0;
+    border-bottom: 1px solid #1a1a2e;
+}
+
+.log-entry.log-info {
+    color: #a0a0b0;
+}
+
+.log-entry.log-action {
+    color: #4caf50;
+}
+
+.log-entry.log-skip {
+    color: #ffd700;
+}
+
+.log-entry.log-error {
+    color: #e94560;
+}
