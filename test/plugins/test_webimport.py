@@ -117,6 +117,83 @@ class WebImportPluginTest(unittest.TestCase, TestHelper):
         finally:
             shutil.rmtree(tmpdir)
 
+    def test_upload_no_files(self):
+        response = self.client.post("/api/upload")
+        assert response.status_code == 400
+        data = json.loads(response.data)
+        assert "error" in data
+
+    def test_upload_valid_files(self):
+        import io
+
+        data = {}
+        # Simulate uploading a file with a relative path.
+        data["files"] = (io.BytesIO(b"fake audio data"), "album/track01.mp3")
+        response = self.client.post(
+            "/api/upload",
+            data=data,
+            content_type="multipart/form-data",
+        )
+        assert response.status_code == 200
+        result = json.loads(response.data)
+        assert "path" in result
+        assert result["files_saved"] == 1
+        # Verify the file was actually saved.
+        saved_path = os.path.join(result["path"], "album", "track01.mp3")
+        assert os.path.exists(saved_path)
+        # Clean up.
+        shutil.rmtree(result["path"])
+
+    def test_upload_multiple_files(self):
+        import io
+
+        response = self.client.post(
+            "/api/upload",
+            data={
+                "files": [
+                    (io.BytesIO(b"data1"), "album/track01.mp3"),
+                    (io.BytesIO(b"data2"), "album/track02.mp3"),
+                    (io.BytesIO(b"data3"), "album/subfolder/track03.mp3"),
+                ],
+            },
+            content_type="multipart/form-data",
+        )
+        assert response.status_code == 200
+        result = json.loads(response.data)
+        assert result["files_saved"] == 3
+        # Verify directory structure.
+        assert os.path.exists(os.path.join(result["path"], "album", "track01.mp3"))
+        assert os.path.exists(os.path.join(result["path"], "album", "track02.mp3"))
+        assert os.path.exists(
+            os.path.join(result["path"], "album", "subfolder", "track03.mp3")
+        )
+        shutil.rmtree(result["path"])
+
+    def test_upload_path_traversal_rejected(self):
+        import io
+
+        response = self.client.post(
+            "/api/upload",
+            data={
+                "files": [
+                    (io.BytesIO(b"evil"), "../../../etc/passwd"),
+                ],
+            },
+            content_type="multipart/form-data",
+        )
+        assert response.status_code == 200
+        result = json.loads(response.data)
+        # The ".." components are stripped, so the file is saved safely
+        # inside the temp directory as "etc/passwd".
+        assert result["files_saved"] == 1
+        saved_path = os.path.join(result["path"], "etc", "passwd")
+        assert os.path.exists(saved_path)
+        # Verify the file is inside the upload directory, not outside it.
+        assert os.path.commonpath(
+            [result["path"], saved_path]
+        ) == result["path"]
+        shutil.rmtree(result["path"])
+
 
 class WebImportSessionTest(unittest.TestCase, TestHelper):
     def setUp(self):

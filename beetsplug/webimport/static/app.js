@@ -4,17 +4,138 @@ let currentSessionId = null;
 let polling = false;
 let currentQuestion = null;
 
-/* ----------------------------- Import Start ------------------------------- */
+/* ----------------------------- Drag and Drop ------------------------------ */
 
-function startImport() {
-    const pathInput = document.getElementById("import-path");
-    const path = pathInput.value.trim();
-    if (!path) {
-        alert("Please enter a path to import.");
+(function setupDropZone() {
+    var dropZone = document.getElementById("drop-zone");
+    if (!dropZone) return;
+
+    ["dragenter", "dragover"].forEach(function(evt) {
+        dropZone.addEventListener(evt, function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            dropZone.classList.add("drag-over");
+        });
+    });
+
+    ["dragleave", "drop"].forEach(function(evt) {
+        dropZone.addEventListener(evt, function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            dropZone.classList.remove("drag-over");
+        });
+    });
+
+    dropZone.addEventListener("drop", function(e) {
+        handleDrop(e);
+    });
+})();
+
+function handleDrop(e) {
+    var items = e.dataTransfer.items;
+    if (!items || items.length === 0) return;
+
+    var allFiles = [];
+    var pending = 0;
+
+    /* Recursively read directory entries from the DataTransfer API. */
+    function readEntry(entry, path) {
+        if (entry.isFile) {
+            pending++;
+            entry.file(function(file) {
+                /* Store the relative path so the server can recreate the structure. */
+                file._relativePath = path + file.name;
+                allFiles.push(file);
+                pending--;
+                if (pending === 0) uploadFiles(allFiles);
+            });
+        } else if (entry.isDirectory) {
+            pending++;
+            var reader = entry.createReader();
+            reader.readEntries(function(entries) {
+                for (var i = 0; i < entries.length; i++) {
+                    readEntry(entries[i], path + entry.name + "/");
+                }
+                pending--;
+                if (pending === 0) uploadFiles(allFiles);
+            });
+        }
+    }
+
+    for (var i = 0; i < items.length; i++) {
+        var entry = items[i].webkitGetAsEntry && items[i].webkitGetAsEntry();
+        if (entry) {
+            readEntry(entry, "");
+        }
+    }
+}
+
+function uploadFiles(files) {
+    if (files.length === 0) {
+        alert("No files found in the dropped folder.");
         return;
     }
 
-    const startBtn = document.getElementById("start-btn");
+    var uploadProgress = document.getElementById("upload-progress");
+    var uploadBar = document.getElementById("upload-bar");
+    var uploadStatus = document.getElementById("upload-status");
+    var dropContent = document.querySelector(".drop-zone-content");
+
+    uploadProgress.classList.remove("hidden");
+    dropContent.classList.add("hidden");
+    uploadStatus.textContent = "Uploading " + files.length + " files...";
+    uploadBar.style.width = "0%";
+
+    var formData = new FormData();
+    for (var i = 0; i < files.length; i++) {
+        /* Use the relative path as the filename so the server preserves structure. */
+        formData.append("files", files[i], files[i]._relativePath || files[i].name);
+    }
+
+    var xhr = new XMLHttpRequest();
+    xhr.open("POST", "/api/upload", true);
+
+    xhr.upload.addEventListener("progress", function(e) {
+        if (e.lengthComputable) {
+            var pct = Math.round((e.loaded / e.total) * 100);
+            uploadBar.style.width = pct + "%";
+            uploadStatus.textContent = "Uploading... " + pct + "%";
+        }
+    });
+
+    xhr.onload = function() {
+        if (xhr.status === 200) {
+            var data = JSON.parse(xhr.responseText);
+            uploadStatus.textContent = "Upload complete! " + data.files_saved + " files uploaded.";
+            uploadBar.style.width = "100%";
+
+            /* Auto-start import with the uploaded path. */
+            startImportWithPath(data.path);
+        } else {
+            var err = JSON.parse(xhr.responseText);
+            uploadStatus.textContent = "Upload failed: " + (err.error || "unknown error");
+            setTimeout(resetDropZone, 3000);
+        }
+    };
+
+    xhr.onerror = function() {
+        uploadStatus.textContent = "Upload failed: network error";
+        setTimeout(resetDropZone, 3000);
+    };
+
+    xhr.send(formData);
+}
+
+function resetDropZone() {
+    var uploadProgress = document.getElementById("upload-progress");
+    var dropContent = document.querySelector(".drop-zone-content");
+    uploadProgress.classList.add("hidden");
+    dropContent.classList.remove("hidden");
+}
+
+/* Start import for a given server path (used by both path input and upload). */
+function startImportWithPath(path) {
+    var startBtn = document.getElementById("start-btn");
     startBtn.disabled = true;
 
     fetch("/api/start", {
@@ -27,6 +148,7 @@ function startImport() {
             if (data.error) {
                 alert("Error: " + data.error);
                 startBtn.disabled = false;
+                resetDropZone();
                 return;
             }
             currentSessionId = data.session_id;
@@ -39,7 +161,20 @@ function startImport() {
         .catch(function(err) {
             alert("Failed to start import: " + err);
             startBtn.disabled = false;
+            resetDropZone();
         });
+}
+
+/* ----------------------------- Import Start ------------------------------- */
+
+function startImport() {
+    const pathInput = document.getElementById("import-path");
+    const path = pathInput.value.trim();
+    if (!path) {
+        alert("Please enter a path to import.");
+        return;
+    }
+    startImportWithPath(path);
 }
 
 /* Handle Enter key in path input */
@@ -435,4 +570,5 @@ function resetUI() {
     document.getElementById("progress-title").textContent = "Importing...";
     document.getElementById("import-path").value = "";
     document.getElementById("start-btn").disabled = false;
+    resetDropZone();
 }

@@ -23,6 +23,8 @@ from __future__ import annotations
 
 import os
 import queue
+import shutil
+import tempfile
 
 import flask
 from flask import jsonify
@@ -144,6 +146,51 @@ def delete_session(session_id):
     if not session:
         return jsonify({"error": "Session not found"}), 404
     return jsonify({"status": "deleted"})
+
+
+@app.route("/api/upload", methods=["POST"])
+def upload_files():
+    """Upload music files via drag-and-drop.
+
+    Receives files with their relative paths preserved. Files are saved
+    into a temporary directory that can then be passed to start_import.
+    The relative directory structure from the browser is preserved.
+    """
+    if "files" not in flask.request.files:
+        return jsonify({"error": "No files uploaded"}), 400
+
+    files = flask.request.files.getlist("files")
+    if not files:
+        return jsonify({"error": "No files uploaded"}), 400
+
+    # Create a temp directory to store uploaded files.
+    upload_dir = tempfile.mkdtemp(prefix="beets_import_")
+
+    saved = 0
+    for f in files:
+        # The relative path is sent via the webkitRelativePath-based
+        # form field name, or as a "paths" form field.
+        relative_path = f.filename
+        if not relative_path:
+            continue
+
+        # Sanitize: prevent path traversal.
+        # Normalize and reject any component that is ".." or starts with "/".
+        parts = relative_path.replace("\\", "/").split("/")
+        safe_parts = [p for p in parts if p and p != ".."]
+        if not safe_parts:
+            continue
+
+        dest = os.path.join(upload_dir, *safe_parts)
+        os.makedirs(os.path.dirname(dest), exist_ok=True)
+        f.save(dest)
+        saved += 1
+
+    if saved == 0:
+        shutil.rmtree(upload_dir)
+        return jsonify({"error": "No valid files uploaded"}), 400
+
+    return jsonify({"path": upload_dir, "files_saved": saved})
 
 
 # ----------------------------- Plugin Class -------------------------------- #

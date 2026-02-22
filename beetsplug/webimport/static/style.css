@@ -73,6 +73,91 @@ main {
     border-color: #e94560;
 }
 
+/* Drop Zone */
+.drop-zone {
+    border: 2px dashed #0f3460;
+    border-radius: 8px;
+    padding: 2.5rem 1.5rem;
+    text-align: center;
+    transition: border-color 0.2s, background 0.2s;
+    cursor: pointer;
+    margin-bottom: 1rem;
+    position: relative;
+}
+
+.drop-zone:hover {
+    border-color: #e94560;
+    background: rgba(233, 69, 96, 0.05);
+}
+
+.drop-zone.drag-over {
+    border-color: #e94560;
+    background: rgba(233, 69, 96, 0.1);
+    border-style: solid;
+}
+
+.drop-zone-icon {
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.drop-zone-text {
+    color: #e0e0e0;
+    font-size: 1.1rem;
+    margin-bottom: 0.25rem;
+}
+
+.drop-zone-hint {
+    color: #666;
+    font-size: 0.85rem;
+}
+
+.upload-progress {
+    margin-top: 1rem;
+}
+
+.upload-progress-bar {
+    background: #1a1a2e;
+    border-radius: 4px;
+    height: 8px;
+    overflow: hidden;
+    margin-bottom: 0.5rem;
+}
+
+.upload-bar {
+    background: #e94560;
+    height: 100%;
+    width: 0%;
+    transition: width 0.3s;
+    border-radius: 4px;
+}
+
+#upload-status {
+    font-size: 0.85rem;
+    color: #a0a0b0;
+}
+
+/* Separator */
+.separator {
+    display: flex;
+    align-items: center;
+    margin: 1rem 0;
+    color: #666;
+    font-size: 0.85rem;
+}
+
+.separator::before,
+.separator::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: #0f3460;
+}
+
+.separator span {
+    padding: 0 0.75rem;
+}
+
 button, .btn {
     padding: 0.75rem 1.5rem;
     border: none;

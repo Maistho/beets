@@ -15,9 +15,24 @@
         <!-- Import Start Panel -->
         <section id="start-panel" class="panel">
             <h2>Import Music</h2>
-            <p>Enter the path to a folder of music to import into your beets library.</p>
+
+            <!-- Drag and Drop Zone -->
+            <div id="drop-zone" class="drop-zone">
+                <div class="drop-zone-content">
+                    <div class="drop-zone-icon">📂</div>
+                    <p class="drop-zone-text">Drag &amp; drop a folder of music here</p>
+                    <p class="drop-zone-hint">or use the path input below</p>
+                </div>
+                <div id="upload-progress" class="upload-progress hidden">
+                    <div class="upload-progress-bar"><div id="upload-bar" class="upload-bar"></div></div>
+                    <span id="upload-status">Uploading...</span>
+                </div>
+            </div>
+
+            <div class="separator"><span>or enter a server path</span></div>
+
             <div class="input-group">
-                <input type="text" id="import-path" placeholder="/path/to/music/folder" autofocus>
+                <input type="text" id="import-path" placeholder="/path/to/music/folder">
                 <button id="start-btn" onclick="startImport()">Import</button>
             </div>
         </section>
